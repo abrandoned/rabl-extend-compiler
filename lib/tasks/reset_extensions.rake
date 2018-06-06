@@ -5,8 +5,8 @@ require "stringio"
 namespace :rabl do
   namespace :extend do
     namespace :compiler do
-      desc "verify that all extensions are created and the signatures match; return exit(1) if not verifiable"
-      task :verify do
+      desc "reset extensions to be compiled"
+      task :reset do
         view_paths = ::Rabl.configuration.view_paths
 
         view_paths.each do |view_path|
@@ -28,23 +28,24 @@ namespace :rabl do
 
               if file_line.starts_with?("# rabl-extend-compiler extends")
                 extension_file = file_line.scan(/\A[[:space:]]*#[[:space:]]+rabl-extend-compiler[[:space:]]*extends[([:space:]]*['"]+([^"]*)['"]+/).flatten.first
-                extension_filename = "#{views_path}/#{extension_file}.rabl"
+                  extension_filename = "#{views_path}/#{extension_file}.rabl"
                 extension_file_digest = file_line.split("=>").last.gsub(/[[:space:]]/, "")
 
-                next if extension_file_digest == ::Digest::SHA256.file(extension_filename).hexdigest
-                $stderr << "rabl-extend-compiler: Compiled extension digest mismatch #{extension_filename}"
-                $stderr << "rabl-extend-compiler: Run rake rabl:extend:compiler:all to reset"
-
-                exit(1)
+                if extension_file_digest == ::Digest::SHA256.file(extension_filename).hexdigest
+                  new_file_contents.puts file_line
+                else
+                  new_file_contents.puts file_line.split("=>").first.gsub("# rabl-extend-compiler ", "")
+                  waiting = true
+                  waiting_hash = extension_file_digest
+                end
+              else
+                new_file_contents.puts file_line
               end
             end
 
-            file_contents.each_line do |file_line|
-              extension_file = file_line.scan(/\A[[:space:]]*extends[([:space:]]*['"]+([^"]*)['"]+/).flatten
-              next if extension_file.empty?
-              $stderr << "rabl-extend-compiler: Uncompiled extenion at #{extension_file.first}"
-
-              exit(1)
+            # Replace the file if the contents changed and the following will rewrite it again
+            if file_contents != new_file_contents.string
+              ::File.write(rabl_file, new_file_contents.string)
             end
           end
         end
