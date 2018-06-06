@@ -1,4 +1,5 @@
 .ruby*
+*.lock
 /.bundle/
 /.yardoc
 /_yardoc/
