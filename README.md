@@ -30,8 +30,11 @@ This gem merely outlines the components and they may be used as you see fit at v
 The rake tasks are:
 
 `rake rabl:extend:compiler:all` Runs all steps
+
 `rake rabl:extend:compiler:reset` Will reset all signatures from the extended files
+
 `rake rabl:extend:compiler:compile` Will compile and sign each use of `extend` in the code base
+
 `rake rabl:extend:compiler:verify` Will `exit(1)` if the extensions are not compiled or the signatures do not match on the compiled extensions
 
 
