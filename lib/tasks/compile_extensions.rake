@@ -7,6 +7,7 @@ namespace :rabl do
     namespace :compiler do
       desc "compile all uncompbiled extensions into rabl files"
       task :compile do
+        ::Rake.application["environment"].invoke if ::Rake::Task.task_defined?("environment")
         view_paths = ::Rabl.configuration.view_paths
 
         loop do

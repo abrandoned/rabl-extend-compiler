@@ -7,6 +7,7 @@ namespace :rabl do
     namespace :compiler do
       desc "verify that all extensions are created and the signatures match; return exit(1) if not verifiable"
       task :verify do
+        ::Rake.application["environment"].invoke if ::Rake::Task.task_defined?("environment")
         view_paths = ::Rabl.configuration.view_paths
 
         view_paths.each do |view_path|

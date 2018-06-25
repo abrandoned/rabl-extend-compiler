@@ -7,6 +7,7 @@ namespace :rabl do
     namespace :compiler do
       desc "reset extensions to be compiled"
       task :reset do
+        ::Rake.application["environment"].invoke if ::Rake::Task.task_defined?("environment")
         view_paths = ::Rabl.configuration.view_paths
 
         view_paths.each do |view_path|
