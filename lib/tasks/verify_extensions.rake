@@ -9,6 +9,7 @@ namespace :rabl do
       task :verify do
         ::Rake.application["environment"].invoke if ::Rake::Task.task_defined?("environment")
         view_paths = ::Rabl.configuration.view_paths
+        files_with_multiple_extensions = []
 
         view_paths.each do |view_path|
           ::Dir.glob("#{view_path}/**/*.rabl").each do |rabl_file|
@@ -21,13 +22,15 @@ namespace :rabl do
             #
             waiting = false
             waiting_hash = ""
+            files_with_multiple_extensions << rabl_file if file_contents.scan(/#[[:space:]]*rabl-extend-compiler[[:space:]]*extends/).size > 1
+
             file_contents.each_line do |file_line|
               if waiting
                 waiting = !file_line.include?(waiting_hash) # if we are in a waiting state then we throw the line away
                 next
               end
 
-              if file_line.start_with?("# rabl-extend-compiler extends")
+              if file_line.strip.start_with?("# rabl-extend-compiler extends")
                 extension_file = file_line.scan(/\A[[:space:]]*#[[:space:]]+rabl-extend-compiler[[:space:]]*extends[([:space:]]*['"]+([^"]*)['"]+/).flatten.first
                 extension_filename = "#{view_path}/#{extension_file}.rabl"
                 extension_file_digest = file_line.split("=>").last.gsub(/[[:space:]]/, "")
@@ -47,6 +50,17 @@ namespace :rabl do
 
               exit(1)
             end
+          end
+
+          files_with_multiple_extensions.each do |file_with_multiple_extensions|
+            $stderr.puts <<~MULTIPLE_EXTENSIONS
+              rable-extend-compiler has found a view file with more than 1 extension
+              this can introduce odd behavior and should be manually verified that this
+              is the expected behavior for your situation
+
+              File: #{file_with_multiple_extensions}
+
+            MULTIPLE_EXTENSIONS
           end
         end
       end
