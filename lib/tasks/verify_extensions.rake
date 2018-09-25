@@ -30,7 +30,7 @@ namespace :rabl do
                 next
               end
 
-              if file_line.strip.start_with?("# rabl-extend-compiler extends")
+              if file_line.strip.gsub(/[[:space:]]+/, " ").start_with?("# rabl-extend-compiler extends")
                 extension_file = file_line.scan(/\A[[:space:]]*#[[:space:]]+rabl-extend-compiler[[:space:]]*extends[([:space:]]*['"]+([^"]*)['"]+/).flatten.first
                 extension_filename = "#{view_path}/#{extension_file}.rabl"
                 extension_file_digest = file_line.split("=>").last.gsub(/[[:space:]]/, "")
