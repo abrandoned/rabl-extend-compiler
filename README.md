@@ -20,7 +20,7 @@ Or install it yourself as:
 When using [Rabl](https://github.com/nesquena/rabl) there is a DSL method called `extend` which embeds another template in the current template and serves as a
 mechanism to be DRY and maintain object definitions in a single place.
 
-One signficant downsie of such a pattern is that the template rendering for large number of collections can be significantly lower (we have measured from 10-25% slower on collections up to 1000 objects)
+One signficant downside of such a pattern is that the template rendering for large number of collections can be significantly lower (we have measured from 10-25% slower on collections up to 1000 objects)
 
 In order to help facilitate still using Rabl (it's a great library) we dediced to write a few rake tasks that allow us the benefits of then extension system
 without the drawbacks. Attempting to emulate something like what is mentioned in this [issue](https://github.com/nesquena/rabl/issues/500) and running rake tasks to verify or compile the extensions before moving to production.
